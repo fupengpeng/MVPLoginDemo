@@ -23,15 +23,19 @@ import okhttp3.Response;
  *     登录的model
  */
 public class LoginModel implements LoginModelInterface {
+
     //登录成功返回的消息实体
     private LoginInfo loginInfo;
+
     //实现LoginModelInterface接口后，重写login方法
     @Override
     public void login(final String tel, final String password, final OnLoginListener listener) {
+
         //子线程耗时操作
         new Thread() {
             @Override
             public void run() {
+
                 //创建okHttpClient对象
                 OkHttpClient okHttpClient = new OkHttpClient();
                 //创建Post请求用RequestBody
@@ -48,25 +52,19 @@ public class LoginModel implements LoginModelInterface {
                 Call call = okHttpClient.newCall(request);
                 //请求加入调度
                 call.enqueue(new Callback() {
+
+
                     @Override
                     public void onFailure(Call call, IOException e) {
                         Log.e("zss", "登录失败");
                         //登录失败调用失败的方法
                         listener.loginFailed();
                     }
+
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         Log.i("zss", "网络请求成功，返回请求数据---- + response.body().string()");
-                        loginInfo = new LoginInfo();
-                        //解析登录成功返回的json字符串，得到消息实体
-                        try {
-                            JSONObject jsonObject = new JSONObject(response.body().string());
-                            loginInfo.setInfo(jsonObject.getString("info"));
-                            loginInfo.setCode(jsonObject.getInt("code"));
-                            loginInfo.setData(jsonObject.getString("Data"));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        ResponseLoginInfoAnalysis(response);
                         if (loginInfo.getCode() == 0){
                             //登录成功调用成功的方法
                             listener.loginSuccess(loginInfo);
@@ -75,8 +73,25 @@ public class LoginModel implements LoginModelInterface {
                             listener.loginFailed();
                         }
                     }
+
                 });
             }
         }.start();
+
+    }
+
+
+    //网络请求数据解析
+    private void ResponseLoginInfoAnalysis(Response response) throws IOException {
+        loginInfo = new LoginInfo();
+        //解析登录成功返回的json字符串，得到消息实体
+        try {
+            JSONObject jsonObject = new JSONObject(response.body().string());
+            loginInfo.setInfo(jsonObject.getString("info"));
+            loginInfo.setCode(jsonObject.getInt("code"));
+            loginInfo.setData(jsonObject.getString("Data"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

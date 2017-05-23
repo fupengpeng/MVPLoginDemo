@@ -13,31 +13,40 @@ import com.fupengpeng.mvplogindemo.login.view.LoginView;
  */
 
 public class LoginPresenter  {
+
     //实例化View接口对象
     LoginView loginView;
+
     //实例化Model对象
     LoginModelInterface loginModelInterface = new LoginModel();
+
     //接收View传递过来的网络请求参数
     private String tel;
     private String password;
+
+    private Handler mHandler = new Handler();
+
     //通过构造方法实例化loginView
     public LoginPresenter(LoginView loginView) {
         this.loginView = loginView;
     }
-    private Handler mHandler = new Handler();
+
     /**
      * 登录方法
      */
     public void login(){
         //显示进度条
         loginView.showProgressBar();
+
         //接收View传递过来的网络请求参数
         tel = loginView.getTel();
         password = loginView.getPassword();
+
         //让model load data
         if (loginModelInterface != null){
             //使用Model对象调用login方法进行网络请求，传递进来通过View获取到的参数。  实例化OnLoginListener接口，实现里面的方法
             loginModelInterface.login(tel, password,  new LoginModelInterface.OnLoginListener() {
+
                 @Override
                 public void loginSuccess(final LoginInfo loginInfo) {
                     //需要在UI线程执行
@@ -50,6 +59,7 @@ public class LoginPresenter  {
                         }
                     });
                 }
+
                 @Override
                 public void loginFailed() {
                     //需要在UI线程执行
@@ -65,7 +75,11 @@ public class LoginPresenter  {
                     });
 
                 }
+
             });
+
         }
+
     }
+
 }

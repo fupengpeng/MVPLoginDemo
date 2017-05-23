@@ -8,10 +8,12 @@ import com.fupengpeng.mvplogindemo.login.entity.LoginInfo;
  *     登录的model接口
  */
 public interface LoginModelInterface {
+
     /**
      * 登录
      */
     void login(String tel, String password,  OnLoginListener listener);
+
     /**
      * 登录的监听
      */
