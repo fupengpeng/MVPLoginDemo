@@ -1,7 +1,9 @@
-package com.fupengpeng.mvplogindemo;
+package com.fupengpeng.mvplogindemo.register;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.fupengpeng.mvplogindemo.R;
 
 public class RegisterActivity extends AppCompatActivity {
 

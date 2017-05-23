@@ -1,4 +1,4 @@
-package com.fupengpeng.mvplogindemo.entity;
+package com.fupengpeng.mvplogindemo.login.entity;
 
 /**
  * Created by fupengpeng on 2017/5/23 0023.
