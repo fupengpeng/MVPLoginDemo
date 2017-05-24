@@ -12,26 +12,42 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.fupengpeng.mvplogindemo.base.WaitDialog;
 import com.fupengpeng.mvplogindemo.home.HomeActivity;
 import com.fupengpeng.mvplogindemo.R;
 import com.fupengpeng.mvplogindemo.register.RegisterActivity;
 import com.fupengpeng.mvplogindemo.login.entity.LoginInfo;
 import com.fupengpeng.mvplogindemo.login.presenter.LoginPresenter;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnTextChanged;
+import butterknife.Unbinder;
+
 /**
  * 登录主页面
  */
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener,LoginView{
+public class LoginActivity extends AppCompatActivity implements LoginView{
     public static final String TAG = "LoginActivity";
     /**
      * 登录页面的控件声明
      */
-    private EditText editTextTel;
-    private EditText editTextPassword;
-    private Button buttonLogin;
-    private TextView textViewRegister;
-    private ProgressBar progressBar;
+    @BindView(R.id.et_password)
+    EditText editTextPassword;
+    @BindView(R.id.et_tel)
+    EditText editTextTel;
+    @BindView(R.id.btn_login)
+    Button buttonLogin;
+    @BindView(R.id.tv_register)
+    TextView textViewRegister;
+    @BindView(R.id.pb_login)
+    ProgressBar progressBar;
+
+    //请求时的等待框
+    private WaitDialog waitDialog;
 
     /**
      * 登录时输入的用户账号和密码
@@ -43,88 +59,44 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-//        EventBus.getDefault().register(this);//订阅
-        init();
+        ButterKnife.bind(this);
+        //创建等待框
+        waitDialog = new WaitDialog(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        EventBus.getDefault().unregister(this);//解除订阅
     }
 
     /**
-     * 登录页面的控件获取，监听事件
+     * editText监听事件
      */
-    private void init() {
-        editTextTel = (EditText) findViewById(R.id.et_tel);
-        editTextPassword = (EditText) findViewById(R.id.et_password);
-        buttonLogin = (Button) findViewById(R.id.btn_login);
-        textViewRegister = (TextView) findViewById(R.id.tv_register);
-        progressBar  = (ProgressBar) findViewById(R.id.pb_login);
-
-        //用户账号输入监听，获取输入内容
-        editTextTel.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                tel = editTextTel.getText().toString();
-                Log.e(TAG, "afterTextChanged: ---001---"+tel );
-            }
-        });
-        //用户密码输入监听，获取输入内容
-        editTextPassword.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                password = editTextPassword.getText().toString();
-                Log.e(TAG, "afterTextChanged: ---002---"+password );
-                //判断用户名和密码是否为空
-                boolean canLogin = !(TextUtils.isEmpty(tel) || TextUtils.isEmpty(password));
-                buttonLogin.setEnabled(canLogin);
-            }
-        });
-        //登录和快速注册的监听
-        buttonLogin.setOnClickListener(this);
-        textViewRegister.setOnClickListener(this);
+    @OnTextChanged(value = R.id.et_tel,callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void afterTextChangedTel(Editable s) {
+        tel = editTextTel.getText().toString();
     }
-    // 登录和快速注册的点击事件
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.btn_login:
-                //根据输入的用户名和密码进行网络请求，并获取请求成功或者失败的展示
-                //登录成功跳转至主页面，登录失败提示登录失败原因
-                //实例化LoginPresenter对象，调用login方法是现代登录
-                new LoginPresenter(this).login();
-//                Toast.makeText(LoginActivity.this,tel+"---"+"登录去"+"---"+password,Toast.LENGTH_LONG).show();
-                break;
-            case R.id.tv_register:
-                //调用toRegisterActivity方法跳转至注册页面
-                toRegisterActivity();
-                Log.e(TAG, "onClick: "+"注册去");
-//                Toast.makeText(LoginActivity.this,"注册去",Toast.LENGTH_LONG).show();
-                break;
+    @OnTextChanged(value = R.id.et_password,callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void afterTextChangedPassword(Editable s) {
+        password = editTextPassword.getText().toString();
+        Log.e(TAG, "afterTextChanged: ---002---"+password );
+        //判断用户名和密码是否为空
+        boolean canLogin = !(TextUtils.isEmpty(tel) || TextUtils.isEmpty(password));
+        buttonLogin.setEnabled(canLogin);
+    }
 
-        }
+    // 登录和快速注册的点击事件
+    @OnClick(R.id.btn_login)
+    public void login(){
+        //根据输入的用户名和密码进行网络请求，并获取请求成功或者失败的展示
+        //登录成功跳转至主页面，登录失败提示登录失败原因
+        //实例化LoginPresenter对象，调用login方法是现代登录
+        new LoginPresenter(this).login();
+    }
+    @OnClick(R.id.tv_register)
+    public void register(){
+        //调用toRegisterActivity方法跳转至注册页面
+        toRegisterActivity();
     }
 
 
@@ -145,12 +117,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void showProgressBar() {
-        progressBar.setVisibility(View.VISIBLE);
+//        progressBar.setVisibility(View.VISIBLE);
+        //请求开始，展示dialog
+        if (waitDialog != null && !waitDialog.isShowing()){
+            waitDialog.show();
+        }
+
     }
 
     @Override
     public void hideProgressBar() {
-        progressBar.setVisibility(View.GONE);
+//        progressBar.setVisibility(View.GONE);
+        //请求结束，隐藏dialog
+        if (waitDialog != null && waitDialog.isShowing()){
+            waitDialog.dismiss();
+        }
+
     }
 
     @Override
@@ -161,7 +143,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void showFailedError() {
-//        Toast.makeText(LoginActivity.this,"账号或者密码错误，请重新输入！",Toast.LENGTH_LONG).show();
+        Toast.makeText(LoginActivity.this,"账号或者密码错误，请重新输入！",Toast.LENGTH_LONG).show();
         clearUserName();
         clearPassword();
     }

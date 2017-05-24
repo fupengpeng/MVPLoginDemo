@@ -49,15 +49,9 @@ public class LoginPresenter  {
 
                 @Override
                 public void loginSuccess(final LoginInfo loginInfo) {
-                    //需要在UI线程执行
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            //登录成功，隐藏progressbar，跳转至HomeActivity页面
-                            loginView.toHomeActivity(loginInfo);
-                            loginView.hideProgressBar();
-                        }
-                    });
+                    //登录成功，隐藏progressbar，跳转至HomeActivity页面
+                    loginView.toHomeActivity(loginInfo);
+                    loginView.hideProgressBar();
                 }
 
                 @Override

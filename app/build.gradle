@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'com.neenbedankt.android-apt'//增加这一句
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
@@ -19,6 +19,7 @@ android {
     }
 }
 
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -26,10 +27,13 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.jakewharton:butterknife:8.6.0'
-    compile 'com.github.erd:android-volley:1.0.0'
     testCompile 'junit:junit:4.12'
-    compile 'com.google.okhttp:okhttp:20120626'
-    compile 'com.squareup.okhttp3:okhttp:3.8.0'
     compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'org.webjars:sugar:1.4.1'
+    compile 'com.github.satyan:sugar:1.5'
+    compile files('src/main/libs/nohttp1.0.6.jar')
+    compile files('src/main/libs/fastjson-1.2.9.jar')
+    compile 'com.jakewharton:butterknife:8.1.0'
+    apt 'com.jakewharton:butterknife-compiler:8.1.0'
+    //增加这一句
 }
